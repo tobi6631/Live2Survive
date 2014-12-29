@@ -1,7 +1,6 @@
 /*
  * (C) Tobias Development 2014
  */
-
 package game.tdev.Main;
 
 import engine.silnik.ContentLoader;
@@ -27,18 +26,22 @@ public class Main extends BasicGame {
     public Image introPresent;
     public Image introGameName;
     public Image introSilnikEngine;
-    public int introCountDown;
-    public int introStat = 0;
-    public Mixer mixer;
     public Image menuBackground;
+
     public SpriteSheet menuPlayButton;
     public SpriteSheet menuOptionsButton;
     public SpriteSheet menuExitButton;
-    public boolean menuButtonHoverStat[] = new boolean[4];
-    public Game game;
     public SpriteSheet spriteImage;
+
     public int spriteX;
     public int spriteY;
+    public int introCountDown;
+    public int introStat = 0;
+
+    public Mixer mixer;
+    public Game game;
+
+    public boolean menuButtonHoverStat[] = new boolean[4];
 
     /////////////////////////////////////////////// !!!!WARNING!!! 
     public int spriteDat = 260;//////////////////// !!!!DO NOT!!!!
@@ -73,7 +76,7 @@ public class Main extends BasicGame {
             menuOptionsButton = new SpriteSheet(ContentLoader.texturePath + "6.png", 276, 36);
             menuExitButton = new SpriteSheet(ContentLoader.texturePath + "7.png", 156, 36);
             game = new Game();
-            game.init(new Image(ContentLoader.texturePath + "test.png"));
+            game.init();
             spriteImage = new SpriteSheet(ContentLoader.texturePath + "sprite.png", 64, 64);
             loadSpriteAsset(spriteImage);
         }
@@ -188,8 +191,11 @@ public class Main extends BasicGame {
             }
 
             if (Option.getDebugMode()) {
+                g.setColor(Color.green);
+                g.drawString("\nLOADING - Content: DONE!"
+                        + "\nLOADING - GameData & Version 'inDev0.1': DONE!", 10, 10);
                 g.setColor(Color.red);
-                g.drawString("\nLOADING - L2S inDev 0.1", 10, 10);
+                g.drawString("\n\n\nLOADING - tdev.com/mysql/V.?inDev0.1/: FAILURE!", 10, 10);
             } else {
                 g.setColor(Color.red);
                 g.drawString("LOADING - L2S inDev 0.1", 10, 10);

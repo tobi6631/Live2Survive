@@ -4,7 +4,7 @@
 
 package game.tdev.main;
 
-import engine.silnik.WorldGenerator;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -15,25 +15,44 @@ import org.newdawn.slick.Image;
  */
 public class Game {
     
-    public Image worldOnePixelData;
+    public Image worldPixelData[] = new Image[2];
+    
     public boolean renderWorldOne = true;
-    public WorldGenerator worldOne;
+   
+    public int worldGenY = 0;
     
-    //WO 2
-    
-    public void init(Image world1) {
-        worldOnePixelData = world1;
-    }
-    
-    public void update(GameContainer gc, int delta) {
+    public void init() {
         
     }
     
-    public void render(GameContainer gc, Graphics g) {
+    public void update(GameContainer gc, int delta) {
         if(renderWorldOne) {
-            worldOne = new WorldGenerator(worldOnePixelData, g);
-            worldOne.run();
             renderWorldOne = false;
+        }
+    }
+    
+    public void render(GameContainer gc, Graphics g) {
+        
+    }
+    
+    public void runWorldGenerator(Image world) {
+        Image pixelData = world;
+        int worldGenWidth = world.getWidth();
+        int worldGenHeight = world.getHeight();
+        
+        for (int x = 0; x < worldGenWidth; x++) {
+           
+            if (x == worldGenWidth - 1) {
+                worldGenY += 1;
+                x = 0;
+                if (worldGenY == worldGenHeight) {
+                    break;
+                }
+            }
+            
+            if (pixelData.getColor(x, worldGenY).equals(new Color(255, 0, 0))) {
+                pixelData.draw(x * 16, worldGenY * 16, 16, 16);
+            }
         }
     }
 }
