@@ -27,6 +27,7 @@ public class Main extends BasicGame {
     public Image introGameName;
     public Image introSilnikEngine;
     public Image menuBackground;
+    public Image[] world = new Image[2];
 
     public SpriteSheet menuPlayButton;
     public SpriteSheet menuOptionsButton;
@@ -42,11 +43,6 @@ public class Main extends BasicGame {
     public Game game;
 
     public boolean menuButtonHoverStat[] = new boolean[4];
-
-    /////////////////////////////////////////////// !!!!WARNING!!! 
-    public int spriteDat = 260;//////////////////// !!!!DO NOT!!!!
-    public Image sprite[] = new Image[spriteDat];// !!!!DELETE!!!!
-    /////////////////////////////////////////////// !!TUB ER SEJ!!
 
     public Main(String title) {
         super(Option.getGameName());
@@ -75,27 +71,10 @@ public class Main extends BasicGame {
             menuPlayButton = new SpriteSheet(ContentLoader.texturePath + "5.png", 156, 36);
             menuOptionsButton = new SpriteSheet(ContentLoader.texturePath + "6.png", 276, 36);
             menuExitButton = new SpriteSheet(ContentLoader.texturePath + "7.png", 156, 36);
+            world[0] = new Image(ContentLoader.texturePath + "test.png");
             game = new Game();
-            game.init();
             spriteImage = new SpriteSheet(ContentLoader.texturePath + "sprite.png", 64, 64);
-            loadSpriteAsset(spriteImage);
-        }
-    }
-
-    private void loadSpriteAsset(SpriteSheet sprite) {
-        for (int x = 0; x < spriteDat; x++) {
-
-            if (x == sprite.getWidth() / 64) {
-                spriteY += 1;
-                x = 0;
-                if (spriteY == sprite.getHeight() / 64) {
-                    break;
-                }
-            }
-
-            this.sprite[x] = sprite.getSubImage(x, spriteY);
-            spriteX++;
-            System.out.println("LOAD: " + this.sprite[x] + " - AT [X,Y]: " + x + ", " + spriteY);
+            game.init(world, spriteImage);
         }
     }
 
