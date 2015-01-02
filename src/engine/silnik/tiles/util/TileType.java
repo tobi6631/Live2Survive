@@ -2,13 +2,8 @@ package engine.silnik.tiles.util;
 
 
 public enum TileType {
-    JORD_TIL_GRÆS_VENSTREHJØRNE_TOP_0_0,
-    JORD_TIL_GRÆS_VENSTRESIDE_0_1,
-    JORD_TIL_GRÆS_VENSTREHJØRNE_DOWN_0_2,
-    JORD_TIL_GRÆS_TOPDOWN_1_0,
-    GRÆS_1_1,
-    JORD_TIL_GRÆS_DOWNTOP_1_2,
-    JORD_TIL_GRÆS_HØJREHJØRNE_TOP_2_0,
-    JORD_TIL_GRÆS_HØJRESIDE_2_1,
-    JORD_TIL_GRÆS_HØJREHJØRNE_DOWN_2_2;
+    GRÆS000,
+    JORD001,
+    STEN002,
+    TRÆ003;
 }

@@ -8,12 +8,14 @@ public class Option {
     
     private static int WIDTH                             = 800;//864 --F 1920
     private static int HEIGHT                            = 600;//576 --F 1080
-    private static int FPSLIMIT                          = 420;//420  --F 999999
+    private static int FPSLIMIT                          = 999999;//420  --F 999999
     private static int MAX_ALLOWED_TILE_RENDERLEVEL      = 1000;//520
-    private static int SCREEN                            = 0;
+    private static int SCREEN                            = 1;
     private static int LEVEL;
-    private static int SELECT_PLAYER                     = 0;// 0 = Djoy, 1 = Mojo, 2 = Jack
+    private static int SELECT_PLAYER                     = 0;//?
     public  static int FPS                               = 000;// -- main.cls
+    private static float VERSION                         = 0.3F; 
+    private static int BITRATE                           = 32;
         
     private static boolean FULLSCREEN                    = false;
     private static boolean ALLWAYSRENDER                 = true;
@@ -43,6 +45,8 @@ public class Option {
     public static int getLevel()                         {return LEVEL;}
     public static int getMaxAllowedTileRenderLevel()     {return MAX_ALLOWED_TILE_RENDERLEVEL;}
     public static int getSelectPlayer()                  {return SELECT_PLAYER;}
+    public static int getBitRate()                       {return BITRATE;}
+    public static float getVersion()                     {return VERSION;}
         
     public static boolean getFullscreen()                {return FULLSCREEN;}
     public static boolean getAllwaysRender()             {return ALLWAYSRENDER;}

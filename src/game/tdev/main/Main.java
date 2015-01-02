@@ -28,6 +28,8 @@ public class Main extends BasicGame {
     public Image introSilnikEngine;
     public Image menuBackground;
     public Image[] world = new Image[2];
+    public static Image[] player = new Image[1];
+    public Image filterClassicOverlay;
 
     public SpriteSheet menuPlayButton;
     public SpriteSheet menuOptionsButton;
@@ -38,11 +40,14 @@ public class Main extends BasicGame {
     public int spriteY;
     public int introCountDown;
     public int introStat = 0;
+    public static int tiles = 4;
 
     public Mixer mixer;
     public Game game;
 
     public boolean menuButtonHoverStat[] = new boolean[4];
+
+    public static Image tile[] = new Image[tiles];
 
     public Main(String title) {
         super(Option.getGameName());
@@ -61,20 +66,38 @@ public class Main extends BasicGame {
         mixer = new Mixer();
 
         //intro - load EVERYTHING while displaying intro
-        if (Option.getScreen() == 0) {
-            mixer.loopSound(Sound.INTRO, 10);
-            introPresent = new Image(ContentLoader.texturePath + "2.png");
-            introGameName = new Image(ContentLoader.texturePath + "3.png");
-            introSilnikEngine = new Image(ContentLoader.texturePath + "8.png");
+        mixer.loopSound(Sound.INTRO, 10);
+        introPresent = new Image(ContentLoader.texturePath + "2.png");
+        introGameName = new Image(ContentLoader.texturePath + "3.png");
+        introSilnikEngine = new Image(ContentLoader.texturePath + "8.png");
+        player[0] = new Image(ContentLoader.texturePath + "player\\playerF1.png");
+      
+        if (gc.isVSyncRequested()) {
+            introCountDown = 60 * 2;
+        } else {
             introCountDown = 380 * 3;
-            menuBackground = new Image(ContentLoader.texturePath + "4.png");
-            menuPlayButton = new SpriteSheet(ContentLoader.texturePath + "5.png", 156, 36);
-            menuOptionsButton = new SpriteSheet(ContentLoader.texturePath + "6.png", 276, 36);
-            menuExitButton = new SpriteSheet(ContentLoader.texturePath + "7.png", 156, 36);
-            world[0] = new Image(ContentLoader.texturePath + "test.png");
-            game = new Game();
-            spriteImage = new SpriteSheet(ContentLoader.texturePath + "sprite.png", 64, 64);
-            game.init(world, spriteImage);
+        }
+
+        menuBackground = new Image(ContentLoader.texturePath + "4.png");
+        menuPlayButton = new SpriteSheet(ContentLoader.texturePath + "5.png", 156, 36);
+        menuOptionsButton = new SpriteSheet(ContentLoader.texturePath + "6.png", 276, 36);
+        menuExitButton = new SpriteSheet(ContentLoader.texturePath + "7.png", 156, 36);
+        world[0] = new Image(ContentLoader.texturePath + "test2.png");
+        game = new Game();
+        spriteImage = new SpriteSheet(ContentLoader.texturePath + "sprite.png", 64, 64);
+        game.init(world, spriteImage);
+        initTiles();
+        filterClassicOverlay = new Image(ContentLoader.texturePath + "filter\\ClassicOverlay.png");
+        System.out.println("Successfully loaded all tiles!");
+    }
+
+    public void initTiles() {
+        for (int i = 0; i < tiles; i++) {
+            try {
+                tile[i] = new Image(ContentLoader.texturePath + "tiles\\" + i + ".png");
+            } catch (SlickException ex) {
+                System.err.print(ex.getLocalizedMessage());
+            }
         }
     }
 
@@ -86,13 +109,21 @@ public class Main extends BasicGame {
             if (introStat == 0) {
                 introCountDown -= 1;
                 if (introCountDown == 0) {
-                    introCountDown = 380 * 3;
+                    if (gc.isVSyncRequested()) {
+                        introCountDown = 60 * 2;
+                    } else {
+                        introCountDown = 380 * 3;
+                    }
                     introStat = 1;
                 }
             } else if (introStat == 1) {
                 introCountDown -= 1;
                 if (introCountDown == 0) {
-                    introCountDown = 380 * 3;
+                    if (gc.isVSyncRequested()) {
+                        introCountDown = 60 * 2;
+                    } else {
+                        introCountDown = 380 * 3;
+                    }
                     introStat = 2;
                 }
             } else if (introStat == 2) {
@@ -110,21 +141,22 @@ public class Main extends BasicGame {
         //menu
         if (Option.getScreen() == 1) {
 
-            if (mouseOver(new Vector2i(Option.getWidth() / 2 - menuPlayButton.getWidth() / 2,
-                    Option.getHeight() / 2 + 90),
+            if (mouseOver(new Vector2i(gc.getWidth() / 2 - menuPlayButton.getWidth() / 2,
+                    gc.getHeight() / 2 + 90),
                     menuPlayButton.getSubImage(0, 0), gc.getInput())) {
 
                 menuButtonHoverStat[0] = true;
 
                 if (gc.getInput().isMouseButtonDown(0)) {
+                    mixer.stopSound(Sound.INTRO);
                     Option.setScreen(2);
                 }
             } else {
                 menuButtonHoverStat[0] = false;
             }
 
-            if (mouseOver(new Vector2i(Option.getWidth() / 2 - menuOptionsButton.getWidth() / 2,
-                    Option.getHeight() / 2 + 80 * 2),
+            if (mouseOver(new Vector2i(gc.getWidth() / 2 - menuOptionsButton.getWidth() / 2,
+                    gc.getHeight() / 2 + 80 * 2),
                     menuOptionsButton.getSubImage(0, 0), gc.getInput())) {
 
                 menuButtonHoverStat[1] = true;
@@ -136,8 +168,8 @@ public class Main extends BasicGame {
                 menuButtonHoverStat[1] = false;
             }
 
-            if (mouseOver(new Vector2i(Option.getWidth() / 2 - menuExitButton.getWidth() / 2,
-                    Option.getHeight() / 2 + 78 * 3),
+            if (mouseOver(new Vector2i(gc.getWidth() / 2 - menuExitButton.getWidth() / 2,
+                    gc.getHeight() / 2 + 78 * 3),
                     menuExitButton.getSubImage(0, 0), gc.getInput())) {
 
                 menuButtonHoverStat[2] = true;
@@ -162,63 +194,64 @@ public class Main extends BasicGame {
         //intro
         if (Option.getScreen() == 0) {
             if (introStat == 0) {
-                introPresent.draw(0, 0, Option.getWidth(), Option.getHeight());
+                introPresent.draw(0, 0, gc.getWidth(), gc.getHeight());
             } else if (introStat == 1) {
-                introGameName.draw(0, 0, Option.getWidth(), Option.getHeight());
+                introGameName.draw(0, 0, gc.getWidth(), gc.getHeight());
             } else if (introStat == 2) {
-                introSilnikEngine.draw(0, 0, Option.getWidth(), Option.getHeight());
+                introSilnikEngine.draw(0, 0, gc.getWidth(), gc.getHeight());
             }
 
             if (Option.getDebugMode()) {
                 g.setColor(Color.green);
                 g.drawString("\nLOADING - Content: DONE!"
-                        + "\nLOADING - GameData & Version 'inDev0.1': DONE!", 10, 10);
+                        + "\nLOADING - GameData & Version inDev0.1" + Option.getVersion() + ": DONE!", 10, 10);
                 g.setColor(Color.red);
                 g.drawString("\n\n\nLOADING - tdev.com/mysql/V.?inDev0.1/: FAILURE!", 10, 10);
             } else {
                 g.setColor(Color.red);
-                g.drawString("LOADING - L2S inDev 0.1", 10, 10);
+                g.drawString("LOADING - L2S inDev 0.1" + Option.getVersion() + ": DONE!", 10, 10);
             }
         }
 
         //menu
         if (Option.getScreen() == 1) {
-            menuBackground.draw(0, 0);
+            menuBackground.draw(0, 0, gc.getWidth(), gc.getHeight());
 
             if (!menuButtonHoverStat[0]) {
                 menuPlayButton.getSubImage(0, 0).draw(
-                        Option.getWidth() / 2 - menuPlayButton.getWidth() / 2,
-                        Option.getHeight() / 2 + 90);
+                        gc.getWidth() / 2 - menuPlayButton.getWidth() / 2,
+                        gc.getHeight() / 2 + 90);
             } else {
                 menuPlayButton.getSubImage(0, 1).draw(
-                        Option.getWidth() / 2 - menuPlayButton.getWidth() / 2,
-                        Option.getHeight() / 2 + 90);
+                        gc.getWidth() / 2 - menuPlayButton.getWidth() / 2,
+                        gc.getHeight() / 2 + 90);
             }
 
             if (!menuButtonHoverStat[1]) {
                 menuOptionsButton.getSubImage(0, 0).draw(
-                        Option.getWidth() / 2 - menuOptionsButton.getWidth() / 2,
-                        Option.getHeight() / 2 + 80 * 2);
+                        gc.getWidth() / 2 - menuOptionsButton.getWidth() / 2,
+                        gc.getHeight() / 2 + 80 * 2);
             } else {
                 menuOptionsButton.getSubImage(0, 1).draw(
-                        Option.getWidth() / 2 - menuOptionsButton.getWidth() / 2,
-                        Option.getHeight() / 2 + 80 * 2);
+                        gc.getWidth() / 2 - menuOptionsButton.getWidth() / 2,
+                        gc.getHeight() / 2 + 80 * 2);
             }
 
             if (!menuButtonHoverStat[2]) {
                 menuExitButton.getSubImage(0, 0).draw(
-                        Option.getWidth() / 2 - menuExitButton.getWidth() / 2,
-                        Option.getHeight() / 2 + 78 * 3);
+                        gc.getWidth() / 2 - menuExitButton.getWidth() / 2,
+                        gc.getHeight() / 2 + 78 * 3);
             } else {
                 menuExitButton.getSubImage(0, 1).draw(
-                        Option.getWidth() / 2 - menuExitButton.getWidth() / 2,
-                        Option.getHeight() / 2 + 78 * 3);
+                        gc.getWidth() / 2 - menuExitButton.getWidth() / 2,
+                        gc.getHeight() / 2 + 78 * 3);
             }
         }
 
         //Game
         if (Option.getScreen() == 2) {
-            game.render(gc, g);
+            game.render(gc, g, player);
+            filterClassicOverlay.draw();
         }
 
         if (Option.getDebugMode()) {
@@ -242,6 +275,8 @@ public class Main extends BasicGame {
             game.setTargetFrameRate(Option.getFpsLimit());
             game.setMouseGrabbed(false);
             game.setIcon(ContentLoader.texturePath + "1.png");
+            game.setVSync(false);
+            game.setVerbose(false);
 
             game.start();
         } catch (SlickException ex) {
