@@ -28,7 +28,6 @@ public class Main extends BasicGame {
     public Image introSilnikEngine;
     public Image menuBackground;
     public Image[] world = new Image[2];
-    public static Image[] player = new Image[1];
     public Image filterClassicOverlay;
 
     public SpriteSheet menuPlayButton;
@@ -40,12 +39,13 @@ public class Main extends BasicGame {
     public int spriteY;
     public int introCountDown;
     public int introStat = 0;
-    public static int tiles = 4;
+    public static int tiles = 6;
 
     public Mixer mixer;
     public Game game;
 
     public boolean menuButtonHoverStat[] = new boolean[4];
+    public boolean runGameThread = true;
 
     public static Image tile[] = new Image[tiles];
 
@@ -70,8 +70,7 @@ public class Main extends BasicGame {
         introPresent = new Image(ContentLoader.texturePath + "2.png");
         introGameName = new Image(ContentLoader.texturePath + "3.png");
         introSilnikEngine = new Image(ContentLoader.texturePath + "8.png");
-        player[0] = new Image(ContentLoader.texturePath + "player\\playerF1.png");
-      
+
         if (gc.isVSyncRequested()) {
             introCountDown = 60 * 2;
         } else {
@@ -184,7 +183,7 @@ public class Main extends BasicGame {
 
         //Game
         if (Option.getScreen() == 2) {
-            game.update(gc, delta);
+            game.updatePlayer(gc, delta);
         }
     }
 
@@ -250,8 +249,12 @@ public class Main extends BasicGame {
 
         //Game
         if (Option.getScreen() == 2) {
-            game.render(gc, g, player);
-            filterClassicOverlay.draw();
+            game.render(gc, g);
+            //filterClassicOverlay.draw();
+            if (runGameThread) {
+                new game.tdev.main.GameThread(game.treeTiles, game.staticTiles).start();
+                runGameThread = false;
+            }
         }
 
         if (Option.getDebugMode()) {
@@ -275,7 +278,7 @@ public class Main extends BasicGame {
             game.setTargetFrameRate(Option.getFpsLimit());
             game.setMouseGrabbed(false);
             game.setIcon(ContentLoader.texturePath + "1.png");
-            game.setVSync(false);
+            game.setVSync(true);
             game.setVerbose(false);
 
             game.start();

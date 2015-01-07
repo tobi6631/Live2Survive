@@ -5,5 +5,7 @@ public enum TileType {
     GRÆS000,
     JORD001,
     STEN002,
-    TRÆ003;
+    TRÆ003,
+    TRÆSTUP004,
+    VAND005;
 }

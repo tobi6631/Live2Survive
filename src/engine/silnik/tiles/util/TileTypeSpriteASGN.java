@@ -21,6 +21,9 @@ public class TileTypeSpriteASGN {
         if (type == TileType.JORD001)  {sprite = Main.tile[1];}
         if (type == TileType.STEN002)  {sprite = Main.tile[2];}
         if (type == TileType.TRÆ003)  {sprite = Main.tile[3];}
+        if (type == TileType.TRÆSTUP004)  {sprite = Main.tile[4];}
+        if (type == TileType.VAND005)  {sprite = Main.tile[5];}
+        
         
         return sprite;
     }
