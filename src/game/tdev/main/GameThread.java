@@ -27,29 +27,34 @@ public class GameThread extends Thread {
 
     @Override
     public void run() {
+        System.out.println("Starting GameThread...");
         updateTiles();
-        System.out.println("init1");
+        System.out.println("GameThread Stopped");
     }
 
     public void updateTiles() {
+        System.out.println("GameThread started");
         //update Tiles
         while (this.isAlive()) {
-            for (StaticTile staticTile : staticTiles) {
+            staticTiles.stream().forEach((staticTile) -> {
                 if (worldPerformShape.intersects(staticTile.spriteShape)) {
                     staticTile.insidePerformFrame = true;
                 } else if (!worldPerformShape.contains(staticTile.spriteShape)) {
                     staticTile.insidePerformFrame = false;
                 }
-            }
+            });
 
-            for (TreeTile treeTile : treeTiles) {
+            treeTiles.stream().map((treeTile) -> {
                 treeTile.update();
+                return treeTile;
+            }).forEach((treeTile) -> {
                 if (worldPerformShape.intersects(treeTile.spriteShape)) {
                     treeTile.insidePerformFrame = true;
                 } else if (!worldPerformShape.contains(treeTile.spriteShape)) {
                     treeTile.insidePerformFrame = false;
                 }
-            }
+            }); 
         }
+        System.out.println("GameThread Stopped");
     }
 }

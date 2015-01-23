@@ -1,9 +1,15 @@
 package engine.silnik.tiles;
 
 import engine.silnik.Option;
+import engine.silnik.Vector2f;
+import engine.silnik.Vector2i;
+import engine.silnik.item.Item;
 import engine.silnik.tiles.util.TileType;
 import engine.silnik.tiles.util.TileTypeSpriteASGN;
+import game.tdev.Main.Main;
 import game.tdev.main.Game;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SpriteSheet;
@@ -12,15 +18,19 @@ import org.newdawn.slick.geom.Shape;
 
 public class TreeTile {
 
-    private final float x;
-    private final float y;
-    private final Image sprite;
+    private final int x;
+    private final int y;
+    private int _x;
+    private int _y;
+    private Image sprite;
     public Shape spriteShape;
     public Shape playerFrontBack;
     public Shape playerCollision;
     public boolean insidePerformFrame = true;
+    public int health = 20;
+    private boolean active = true;
 
-    public TreeTile(float x, float y, TileType type, SpriteSheet spriteSheet) {
+    public TreeTile(int x, int y, TileType type, SpriteSheet spriteSheet) {
         this.x = x;
         this.y = y;
 
@@ -33,41 +43,73 @@ public class TreeTile {
     public void render(float xP, float yP, Graphics g) {
         if (insidePerformFrame) {
             sprite.draw(x * Option.getBitRate() + xP, y * Option.getBitRate() + yP);
-            
-            playerFrontBack.setCenterX(x * Option.getBitRate() + xP + 80);
-            playerFrontBack.setCenterY(y * Option.getBitRate() + yP + 45);
-            playerCollision.setCenterX(x * Option.getBitRate() + xP + 80);
-            playerCollision.setCenterY(y * Option.getBitRate() + yP + 123);
-            
-            if(Option.getDebugMode()) {
+
+            _x = x * Option.getBitRate() + Math.round(xP);
+            _y = y * Option.getBitRate() + Math.round(yP);
+
+            playerFrontBack.setCenterX(_x + 80);
+            playerFrontBack.setCenterY(_y + 45);
+            playerCollision.setCenterX(_x + 80);
+            playerCollision.setCenterY(_y + 123);
+
+            //Destroying
+            if (Main.mouseOver(new Vector2i(_x, _y), sprite, Main.inputAll) && health > 0) {
+                g.setColor(Color.green);
+                g.drawString("* Left click to fell tree" + "\n  "
+                        + health + "/20", Main.inputAll.getMouseX() + 10, Main.inputAll.getMouseY());
+                if (Main.inputAll.isMousePressed(0)) {
+                    health -= 2;
+                    g.drawString("-2", Main.inputAll.getMouseX(), Main.inputAll.getMouseY());
+                }
+            }
+
+            if (active) {
+                if (health <= 0) {
+                    sprite = Main.tile[4];
+                    for (int i = 0; i < Game.itemSlot_bar; i++) {
+                        if (Game.itemSlotBar[i].isFree()) {
+                            Game.itemSlotBar[i].addItem(Item.TRÆ001, 3);
+                        }else if(Game.itemSlotBar[i].contains(Item.TRÆ001)){
+                            Game.itemSlotBar[i].addItem(Item.TRÆ001, 3);
+                        }
+                        active = false;
+                        break;
+                    }
+                }
+            }
+
+            if (Option.getDebugMode()) {
+                g.setColor(Color.red);
                 g.draw(playerFrontBack);
                 g.draw(playerCollision);
             }
         }
-        
+
         spriteShape.setX(x * Option.getBitRate() + xP);
         spriteShape.setY(y * Option.getBitRate() + yP);
     }
 
     public void update() {
-        if (playerFrontBack.intersects(Game.playerShape)) {
-            Game.inFront = false;
-        }
-        
-        if(playerCollision.intersects(Game.playerShape) && Game.movement == 1 && Game.inFront) {
-            Game.moveable[0] = false;
-        }
-        
-        if(playerCollision.intersects(Game.playerShape) && Game.movement == 2 && !Game.inFront) {
-            Game.moveable[1] = false;
-        }
-        
-        if(playerCollision.intersects(Game.playerShape) && Game.movement == 3 && !Game.inFront) {
-            Game.moveable[2] = false;
-        }
-        
-        if(playerCollision.intersects(Game.playerShape) && Game.movement == 4 && !Game.inFront) {
-            Game.moveable[3] = false;
+        if (insidePerformFrame) {
+            if (playerFrontBack.intersects(Game.playerShape)) {
+                Game.inFront = false;
+            }
+
+            if (playerCollision.intersects(Game.playerShape) && Game.movement == 1 && Game.inFront) {
+                Game.moveable[0] = false;
+            }
+
+            if (playerCollision.intersects(Game.playerShape) && Game.movement == 2 && !Game.inFront) {
+                Game.moveable[1] = false;
+            }
+
+            if (playerCollision.intersects(Game.playerShape) && Game.movement == 3 && !Game.inFront) {
+                Game.moveable[2] = false;
+            }
+
+            if (playerCollision.intersects(Game.playerShape) && Game.movement == 4 && !Game.inFront) {
+                Game.moveable[3] = false;
+            }
         }
     }
 }

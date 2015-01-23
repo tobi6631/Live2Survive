@@ -30,7 +30,13 @@ public class StaticTile {
     public void render(float xP, float yP, Graphics g) {
         if (insidePerformFrame) {
             sprite.draw(x * Option.getBitRate() + xP, y * Option.getBitRate() + yP, Option.getBitRate(), Option.getBitRate());
+            
+            if(Option.getDebugMode()) {
+                g.setColor(Color.yellow);
+                g.draw(spriteShape);
+            }
         }
+        
         spriteShape.setX(x * Option.getBitRate() + xP);
         spriteShape.setY(y * Option.getBitRate() + yP);
     }

@@ -40,20 +40,23 @@ public class Main extends BasicGame {
     public int introCountDown;
     public int introStat = 0;
     public static int tiles = 6;
+    public static int items = 1;
 
     public Mixer mixer;
     public Game game;
+    public static Input inputAll;
 
     public boolean menuButtonHoverStat[] = new boolean[4];
     public boolean runGameThread = true;
 
     public static Image tile[] = new Image[tiles];
+    public static Image item[] = new Image[items];
 
     public Main(String title) {
         super(Option.getGameName());
     }
 
-    private boolean mouseOver(Vector2i pos, Image button, Input gcInput) {
+    public static boolean mouseOver(Vector2i pos, Image button, Input gcInput) {
         return gcInput.getMouseX() > pos.getX()
                 && gcInput.getMouseX() < pos.getX() + button.getWidth()
                 && gcInput.getMouseY() > pos.getY()
@@ -76,7 +79,8 @@ public class Main extends BasicGame {
         } else {
             introCountDown = 380 * 3;
         }
-
+        
+        initItems();
         menuBackground = new Image(ContentLoader.texturePath + "4.png");
         menuPlayButton = new SpriteSheet(ContentLoader.texturePath + "5.png", 156, 36);
         menuOptionsButton = new SpriteSheet(ContentLoader.texturePath + "6.png", 276, 36);
@@ -86,16 +90,30 @@ public class Main extends BasicGame {
         spriteImage = new SpriteSheet(ContentLoader.texturePath + "sprite.png", 64, 64);
         game.init(world, spriteImage);
         initTiles();
-        filterClassicOverlay = new Image(ContentLoader.texturePath + "filter\\ClassicOverlay.png");
+        
+        filterClassicOverlay = new Image(ContentLoader.texturePath + "filter\\testGUI.png");
         System.out.println("Successfully loaded all tiles!");
+        inputAll = gc.getInput();
     }
 
     public void initTiles() {
         for (int i = 0; i < tiles; i++) {
             try {
                 tile[i] = new Image(ContentLoader.texturePath + "tiles\\" + i + ".png");
-            } catch (SlickException ex) {
+            } catch (Exception ex) {
                 System.err.print(ex.getLocalizedMessage());
+                System.err.print("This error will efect the game plz restart and fix!");
+            }
+        }
+    }
+    
+    public void initItems() {
+        for(int i = 0; i < items; i++) {
+            try {
+                item[i] = new Image(ContentLoader.texturePath + "items\\" + i + ".png");
+            } catch (Exception ex) {
+                System.err.print(ex.getLocalizedMessage());
+                System.err.print("This error will efect the game plz restart and fix!");
             }
         }
     }
@@ -250,7 +268,7 @@ public class Main extends BasicGame {
         //Game
         if (Option.getScreen() == 2) {
             game.render(gc, g);
-            //filterClassicOverlay.draw();
+            //filterClassicOverlay.draw(); BACK
             if (runGameThread) {
                 new game.tdev.main.GameThread(game.treeTiles, game.staticTiles).start();
                 runGameThread = false;
