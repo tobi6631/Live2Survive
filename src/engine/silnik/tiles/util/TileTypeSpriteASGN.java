@@ -5,7 +5,7 @@
  */
 package engine.silnik.tiles.util;
 
-import game.tdev.Main.Main;
+import engine.silnik.main.Main;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SpriteSheet;
 

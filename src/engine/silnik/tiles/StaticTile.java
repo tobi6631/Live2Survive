@@ -3,7 +3,6 @@ package engine.silnik.tiles;
 import engine.silnik.Option;
 import engine.silnik.tiles.util.TileType;
 import engine.silnik.tiles.util.TileTypeSpriteASGN;
-import game.tdev.main.Game;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;

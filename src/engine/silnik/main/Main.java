@@ -1,14 +1,13 @@
 /*
  * (C) Tobias Development 2014
  */
-package game.tdev.Main;
+package engine.silnik.main;
 
 import engine.silnik.ContentLoader;
 import engine.silnik.Mixer;
 import engine.silnik.Option;
 import engine.silnik.Sound;
 import engine.silnik.Vector2i;
-import game.tdev.main.Game;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.AppGameContainer;
@@ -52,7 +51,7 @@ public class Main extends BasicGame {
     public static Image tile[] = new Image[tiles];
     public static Image item[] = new Image[items];
 
-    public Main(String title) {
+    public Main(String name) {
         super(Option.getGameName());
     }
 
@@ -66,6 +65,9 @@ public class Main extends BasicGame {
     @Override
     public void init(GameContainer gc) throws SlickException {
 
+        gc.getGraphics().setColor(Color.green);
+        gc.getGraphics().drawString("LOADING CONTENT....", 10, 10);
+        
         mixer = new Mixer();
 
         //intro - load EVERYTHING while displaying intro
@@ -87,11 +89,12 @@ public class Main extends BasicGame {
         menuExitButton = new SpriteSheet(ContentLoader.texturePath + "7.png", 156, 36);
         world[0] = new Image(ContentLoader.texturePath + "test2.png");
         game = new Game();
-        spriteImage = new SpriteSheet(ContentLoader.texturePath + "sprite.png", 64, 64);
+//        spriteImage = new SpriteSheet(ContentLoader.texturePath + "sprite.png", 64, 64);
         game.init(world, spriteImage);
         initTiles();
         
-        filterClassicOverlay = new Image(ContentLoader.texturePath + "filter\\testGUI.png");
+        filterClassicOverlay = new Image(ContentLoader.texturePath + "filter\\ClassicOverlay.png");
+        
         System.out.println("Successfully loaded all tiles!");
         inputAll = gc.getInput();
     }
@@ -268,20 +271,15 @@ public class Main extends BasicGame {
         //Game
         if (Option.getScreen() == 2) {
             game.render(gc, g);
-            //filterClassicOverlay.draw(); BACK
+            //filterClassicOverlay.draw(); //BACK
             if (runGameThread) {
-                new game.tdev.main.GameThread(game.treeTiles, game.staticTiles).start();
+                new engine.silnik.main.GameThread(game.treeTiles, game.staticTiles, game.base).start();
                 runGameThread = false;
             }
         }
-
-        if (Option.getDebugMode()) {
-            g.setColor(Color.white);
-            g.drawString("FPS: " + gc.getFPS(), 10, 10);
-        }
     }
 
-    public static void main(String[] args) {
+    public void run() {
         try {
             AppGameContainer game = new AppGameContainer(new Main(Option.getGameName()));
 

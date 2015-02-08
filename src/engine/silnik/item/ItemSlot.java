@@ -1,8 +1,9 @@
 package engine.silnik.item;
 
-import game.tdev.Main.Main;
-import game.tdev.main.Game;
+import engine.silnik.Vector2i;
+import engine.silnik.main.Main;
 import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 
@@ -14,6 +15,7 @@ public class ItemSlot {
     private Item type;
     private boolean isFree = true;
     public int ammount;
+    public boolean over = false;
 
     public ItemSlot(int xPos, int yPos) {
         x = xPos;
@@ -23,18 +25,22 @@ public class ItemSlot {
         type = Item.FREE;
     }
 
-    public void render(Graphics g) {
+    public void render(Graphics g, GameContainer gc) {
         if (!isFree && !type.equals(Item.FREE)) {
             item.draw(x, y);
             g.setColor(Color.white);
             g.drawString("" + ammount, x, y);
+
+            if (Main.mouseOver(new Vector2i(x, y), item, gc.getInput())) {
+                over = true;
+            } else {
+                over = false;
+            }
         }
     }
 
     public void addItem(Item type, int ammount) {
         if (this.type.equals(Item.FREE)) {
-            this.type = type;
-
             if (type.equals(Item.TRÆ001) && isFree) {
                 item = Main.item[0];
                 this.ammount += ammount;
@@ -42,10 +48,11 @@ public class ItemSlot {
             }
         }
 
-        if (!isFree) {
+        if (!isFree && !this.type.equals(Item.FREE)) {
             this.ammount += ammount;
-            isFree = false;
         }
+
+        this.type = type;
     }
 
     public boolean isFree() {
@@ -55,16 +62,38 @@ public class ItemSlot {
     public void setIsFree_ONLY_FOR_DEBUG(boolean val) {
         isFree = val;
     }
-    
+
     public boolean contains(Item type) {
         boolean re = false;
-        
-        if(type.equals(this.type)) {
+
+        if (type.equals(this.type)) {
             re = true;
-        }else {
+        } else {
             re = false;
         }
-        
+
         return re;
+    }
+
+    public void drawAN(int x, int y, Graphics g) {
+        if (!isFree && !type.equals(Item.FREE)) {
+            item.draw(x, y);
+            g.setColor(Color.white);
+            g.drawString("" + ammount, x, y);
+        }
+    }
+
+    public Item getItem() {
+        return type;
+    }
+
+    public int getAmmount() {
+        return ammount;
+    }
+
+    public void reset() {
+        type = Item.FREE;
+        ammount = 0;
+        isFree = true;
     }
 }

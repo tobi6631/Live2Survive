@@ -10,11 +10,11 @@ public class Option {
     private static int HEIGHT                            = 600;//576 --F 1080
     private static int FPSLIMIT                          = 999999;//420  --F 999999
     private static int MAX_ALLOWED_TILE_RENDERLEVEL      = 1000;//520
-    private static int SCREEN                            = 1;
+    private static int SCREEN                            = 0;
     private static int LEVEL;
     private static int SELECT_PLAYER                     = 0;//?
     public  static int FPS                               = 000;// -- main.cls
-    private static float VERSION                         = 0.4F; 
+    private static float VERSION                         = 0.6F; 
     private static int BITRATE                           = 32;
         
     private static boolean FULLSCREEN                    = false;
@@ -23,7 +23,7 @@ public class Option {
     private static boolean FORCEEXIT                     = true;
     private static boolean SHOWFPS                       = false;
     private static boolean RESIZABEL                     = true;
-    private static boolean DEBUGMODE                     = false;
+    private static boolean DEBUGMODE                     = true;
     private static boolean DEVELOPMENTMODE               = true;
     private static boolean STOP;
     private static boolean PAUSE;
@@ -37,6 +37,7 @@ public class Option {
     private static boolean DISCO_EA                      = false;
         
     private static String GAMENAME                        = "Live2Survive";
+    private static String USERNAME                        = "PLAYER";//Default
         
     public static int getWidth()                         {return WIDTH;}
     public static int getHeight()                        {return HEIGHT;}
@@ -62,6 +63,8 @@ public class Option {
     public static boolean getPlayerDebug()               {return PLAYER_DEBUG;}
     public static boolean getLevelDone()                 {return LEVEL_DONE;}
     public static boolean getServerMode()                {return SERVER_MODE;}
+    
+    public static String getUsername()                   {return USERNAME;}
     
     //EASTER EGGS
     public static boolean getFireworkEA()                {return FIREWORK_EA;}
@@ -112,6 +115,9 @@ public class Option {
     public static void setPause(boolean bool)        {PAUSE       = bool;}
     public static void setResume(boolean bool)       {RESUME      = bool;}
     public static void setServerMode(boolean bool)   {SERVER_MODE = bool;}
+    public static void setFullScreen(boolean bool)   {FULLSCREEN  = bool;}
+    
+    public static void setUsername(String usrn)      {USERNAME    = usrn;}
         
     public static String getGameName()         {return GAMENAME;}
 }
