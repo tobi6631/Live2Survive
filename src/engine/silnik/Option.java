@@ -10,7 +10,7 @@ public class Option {
     private static int HEIGHT                            = 600;//576 --F 1080
     private static int FPSLIMIT                          = 999999;//420  --F 999999
     private static int MAX_ALLOWED_TILE_RENDERLEVEL      = 1000;//520
-    private static int SCREEN                            = 0;
+    private static int SCREEN                            = 2;
     private static int LEVEL;
     private static int SELECT_PLAYER                     = 0;//?
     public  static int FPS                               = 000;// -- main.cls
@@ -21,7 +21,7 @@ public class Option {
     private static boolean ALLWAYSRENDER                 = true;
     private static boolean CLEAREATCHFRAME               = true;
     private static boolean FORCEEXIT                     = true;
-    private static boolean SHOWFPS                       = false;
+    private static boolean SHOWFPS                       = true;
     private static boolean RESIZABEL                     = true;
     private static boolean DEBUGMODE                     = true;
     private static boolean DEVELOPMENTMODE               = true;

@@ -33,7 +33,6 @@ public class Mixer {
          * Sound HasMap
          */
         sounds = new HashMap<>();
-
         /**
          * Put sound in here
          *
@@ -42,6 +41,13 @@ public class Mixer {
          */
         try {
             sounds.put(Sound.INTRO, new org.newdawn.slick.Sound(res + "intro.wav"));
+            sounds.put(Sound.BACKGROUND_1, new org.newdawn.slick.Sound(res + "bakground_1.wav"));
+            sounds.put(Sound.WOOD_HIT1, new org.newdawn.slick.Sound(res + "dig\\wood1.ogg"));
+            sounds.put(Sound.WOOD_HIT2, new org.newdawn.slick.Sound(res + "dig\\wood2.ogg"));
+            sounds.put(Sound.WOOD_HIT3, new org.newdawn.slick.Sound(res + "dig\\wood3.ogg"));
+            sounds.put(Sound.WOOD_HIT4, new org.newdawn.slick.Sound(res + "dig\\wood4.ogg"));
+            sounds.put(Sound.RAIN, new org.newdawn.slick.Sound(res + "weather\\rain.wav"));
+            sounds.put(Sound.THUNDER, new org.newdawn.slick.Sound(res + "weather\\single_thunder.wav"));
         } catch (SlickException e1) {
             org.newdawn.slick.util.Log.warn(e1.getLocalizedMessage(), e1);
         }

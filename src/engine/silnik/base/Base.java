@@ -103,8 +103,8 @@ public class Base {
             if (upgradeable) {
                 menuText[0] = "Upgrade (PRESS T)";
 
-                if (Main.inputAll.isKeyDown(Input.KEY_T) && hoverMenuState == 1) {
-                    menuText[0] = "Upgrade (NO UPGRADE MENU YET)";
+                if (Main.inputAll.isKeyPressed(Input.KEY_T) && hoverMenuState == 1) {
+                    Game.isBaseUpgradeShopOpen = true;
                 }
             }
 

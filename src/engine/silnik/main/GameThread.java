@@ -10,6 +10,8 @@ import engine.silnik.tiles.StaticTile;
 import engine.silnik.tiles.TreeTile;
 import static engine.silnik.main.Game.worldPerformShape;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -55,9 +57,10 @@ public class GameThread extends Thread {
                     treeTile.insidePerformFrame = true;
                 } else if (!worldPerformShape.contains(treeTile.spriteShape)) {
                     treeTile.insidePerformFrame = false;
+
                 }
-            }); 
-            
+            });
+
             base.stream().map((base1) -> {
                 base1.update();
                 return base1;

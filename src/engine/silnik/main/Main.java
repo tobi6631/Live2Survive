@@ -10,15 +10,19 @@ import engine.silnik.Sound;
 import engine.silnik.Vector2i;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
+import org.newdawn.slick.Font;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.UnicodeFont;
 
 public class Main extends BasicGame {
 
@@ -41,7 +45,7 @@ public class Main extends BasicGame {
     public static int tiles = 6;
     public static int items = 1;
 
-    public Mixer mixer;
+    public static Mixer mixer;
     public Game game;
     public static Input inputAll;
 
@@ -50,6 +54,9 @@ public class Main extends BasicGame {
 
     public static Image tile[] = new Image[tiles];
     public static Image item[] = new Image[items];
+    
+    //TESTING
+    public Font font;
 
     public Main(String name) {
         super(Option.getGameName());
@@ -97,6 +104,8 @@ public class Main extends BasicGame {
         
         System.out.println("Successfully loaded all tiles!");
         inputAll = gc.getInput();
+        
+        font = new TrueTypeFont(new java.awt.Font("KenPixel", java.awt.Font.PLAIN, 32), true);
     }
 
     public void initTiles() {
@@ -210,7 +219,6 @@ public class Main extends BasicGame {
 
     @Override
     public void render(GameContainer gc, Graphics g) throws SlickException {
-
         //intro
         if (Option.getScreen() == 0) {
             if (introStat == 0) {
@@ -274,6 +282,7 @@ public class Main extends BasicGame {
             //filterClassicOverlay.draw(); //BACK
             if (runGameThread) {
                 new engine.silnik.main.GameThread(game.treeTiles, game.staticTiles, game.base).start();
+                mixer.loopSound(Sound.BACKGROUND_1, 0.25F);
                 runGameThread = false;
             }
         }

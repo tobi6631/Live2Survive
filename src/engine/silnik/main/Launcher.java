@@ -6,6 +6,7 @@
 package engine.silnik.main;
 
 import engine.silnik.Option;
+import java.awt.Toolkit;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -31,11 +32,13 @@ public class Launcher extends javax.swing.JFrame {
             Option.setFullScreen(false);
             Option.setDebugMode(true);
             main = new Main(Option.getGameName());
+            Option.setScreen(1);
             main.run();
         } else if (args.equals("normal")) {
             System.out.println("System started from Console - NORMAL");
             Option.setFullScreen(true);
             Option.setDebugMode(false);
+            Option.setScreen(0);
             initComponents();
         }
     }
@@ -68,6 +71,19 @@ public class Launcher extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Live2Survive Launcher");
+        setBounds(new java.awt.Rectangle((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2 - 690 / 2, (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2 - 574 / 2, 0, 0)
+        );
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                formFocusGained(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         jButton1.setText("Login / Start Game");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -91,14 +107,11 @@ public class Launcher extends javax.swing.JFrame {
         jProgressBar1.setValue(15);
 
         jEditorPane1.setEditable(false);
-        jEditorPane1.setForeground(new java.awt.Color(255, 255, 255));
-        jEditorPane1.setToolTipText("Sorry if it look like shit...\n\\nBut i hey its fine for now, u get live news and all that shit, so its ok LOL xD\n");
+        jEditorPane1.setFont(new java.awt.Font("Segoe UI Light", 0, 24)); // NOI18N
+        jEditorPane1.setText("... Website Currently Down!");
+        jEditorPane1.setToolTipText("");
         jEditorPane1.setDoubleBuffered(true);
-        try {
-            jEditorPane1.setPage(new java.net.URL("http://silnikdevelopment.web31.eu/Updates/"));
-        } catch (java.io.IOException e1) {
-            e1.printStackTrace();
-        }
+        jEditorPane1.setOpaque(false);
         jEditorPane1.setSelectedTextColor(new java.awt.Color(0, 0, 0));
         jEditorPane1.setSelectionColor(new java.awt.Color(255, 0, 0));
         jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
@@ -106,9 +119,14 @@ public class Launcher extends javax.swing.JFrame {
                 hyperLink(evt);
             }
         });
+        jEditorPane1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jEditorPane1MouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(jEditorPane1);
 
-        jButton2.setText("jButton2");
+        jButton2.setText("Force Update");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -135,7 +153,7 @@ public class Launcher extends javax.swing.JFrame {
                                 .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton2)
-                                .addGap(138, 138, 138)))
+                                .addGap(140, 140, 140)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -155,7 +173,7 @@ public class Launcher extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 448, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(14, 14, 14)
@@ -163,21 +181,16 @@ public class Launcher extends javax.swing.JFrame {
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
                     .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel1)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1)
-                            .addComponent(jLabel5)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1)
                         .addComponent(jButton2)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1)
+                    .addComponent(jLabel5))
                 .addContainerGap())
         );
 
@@ -202,19 +215,36 @@ public class Launcher extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void hyperLink(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_hyperLink
-
+  
     }//GEN-LAST:event_hyperLink
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         try {
-            URL website = new URL("http://faultgame.com/dump/download/launcher/Launcher.jar");
+            //Check for new update
+            
+            //if new update, download new jarFile into game, update folder
+            URL website = new URL("http://silnikdevelopment.web31.eu/public_html/updates?=0.10.6/update.jar");
             ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-            FileOutputStream fos = new FileOutputStream("C:\\Users\\TKB\\Downloads\\testlol.jar");
+            FileOutputStream fos = new FileOutputStream("C:\\SilnikDevelopment\\Games\\Live2Survive\\update\\l2s.jar");
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
         } catch (IOException ex) {
-            Logger.getLogger(Launcher.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(rootPane, ex.getMessage()
+                    +"\n\nFile not found / or bad internet connection!", "ERROR", JOptionPane.ERROR_MESSAGE);
+            jEditorPane1.getToolkit().beep();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jEditorPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jEditorPane1MouseClicked
+
+    }//GEN-LAST:event_jEditorPane1MouseClicked
+
+    private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
+        
+    }//GEN-LAST:event_formFocusGained
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+ 
+    }//GEN-LAST:event_formWindowOpened
 
     /**
      * @param args the command line arguments

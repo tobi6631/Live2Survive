@@ -32,5 +32,12 @@ package engine.silnik;
  */
 public enum Sound {
 	INTRO,
+        BACKGROUND_1,
+        WOOD_HIT1,
+        WOOD_HIT2,
+        WOOD_HIT3,
+        WOOD_HIT4,
+        RAIN,
+        THUNDER,
         STOP_ALL,
 }

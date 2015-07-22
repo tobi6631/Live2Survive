@@ -1,12 +1,14 @@
 package engine.silnik.tiles;
 
 import engine.silnik.Option;
+import engine.silnik.Sound;
 import engine.silnik.Vector2i;
 import engine.silnik.item.Item;
 import engine.silnik.tiles.util.TileType;
 import engine.silnik.tiles.util.TileTypeSpriteASGN;
 import engine.silnik.main.Game;
 import engine.silnik.main.Main;
+import java.util.Random;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -27,6 +29,8 @@ public class TreeTile {
     public boolean insidePerformFrame = true;
     public int health = 20;
     private boolean active = true;
+    private final Random soundNumberGenerator;
+    private int soundNumber;
 
     public TreeTile(int x, int y, TileType type, SpriteSheet spriteSheet) {
         this.x = x;
@@ -36,6 +40,8 @@ public class TreeTile {
         spriteShape = new Rectangle(x, y, 160, 160);
         playerFrontBack = new Rectangle(x, y, 160, 160);
         playerCollision = new Rectangle(x, y, 30, 10);
+        
+        soundNumberGenerator = new Random();
     }
 
     public void render(float xP, float yP, Graphics g) {
@@ -58,6 +64,13 @@ public class TreeTile {
                 if (Main.inputAll.isMousePressed(0)) {
                     health -= 2;
                     g.drawString("-2", Main.inputAll.getMouseX(), Main.inputAll.getMouseY());
+                    
+                    soundNumber = soundNumberGenerator.nextInt(3);
+                    
+                    if(soundNumber == 0) {Main.mixer.playSound(Sound.WOOD_HIT1);}
+                    else if(soundNumber == 1) {Main.mixer.playSound(Sound.WOOD_HIT2);}
+                    else if(soundNumber == 2) {Main.mixer.playSound(Sound.WOOD_HIT3);}
+                    else if(soundNumber == 3) {Main.mixer.playSound(Sound.WOOD_HIT4);}
                 }
             }
 

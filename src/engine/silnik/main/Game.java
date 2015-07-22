@@ -6,15 +6,22 @@
  */
 package engine.silnik.main;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import engine.silnik.ContentLoader;
 import engine.silnik.Option;
+import engine.silnik.Sound;
 import engine.silnik.Vector2i;
 import engine.silnik.base.Base;
+import engine.silnik.gui.ShopGUI;
+import engine.silnik.gui.ShopItemGUI;
 import engine.silnik.item.ItemSlot;
 import engine.silnik.tiles.StaticTile;
 import engine.silnik.tiles.TreeTile;
 import engine.silnik.tiles.util.TileType;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.Animation;
@@ -23,9 +30,14 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.geom.Line;
+import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
+import org.newdawn.slick.geom.Vector2f;
+import org.newdawn.slick.opengl.SlickCallable;
 
 /**
  *
@@ -60,6 +72,7 @@ public class Game {
     public float healthLevel = 96;//
     public float waterLevel = 96;//  MAX 96, MIN 7
     public float foodLevel = 96;//
+    public static int coins = 0x5445FF;
 
     //InGameGUI
     public Image playerStatus;
@@ -85,11 +98,30 @@ public class Game {
     public int inventorySlot_count = 45;
     public int row = 1;
     public ItemSlot inventorySlot[] = new ItemSlot[inventorySlot_count];
-    
+
     //Base
     public Image baseImg;
     public int MAX_BASE_SPAWN_ALLOWD = 10;//?
     public ArrayList<Base> base = new ArrayList<>();
+
+    //BaseUpgradeGUI
+    public Image testItemLogo;
+    public Image baseGUIItemFrame;
+    public Image baseGUIItemButton_n;
+    public Image baseGUIItemButton_h;
+    public Image baseGUIFrame;
+    public ShopGUI baseUpgradeGUI;
+    public static boolean isBaseUpgradeShopOpen = false;
+
+    //Rain & Thunder Effect
+    private RainDrop[] drops;
+    private int dropCount = 7000;
+    public static boolean isRaining = true;
+    public static boolean isThunder = true;
+    private boolean rainLoop = true;
+    public static int stormSize = 700;// Smaller = bigger storm... Bigger = .... Smaller storm
+    private LightingBoltEffect lightingBoltEffect;
+    private int lightingCount = 100;
 
     public void init(Image[] world, SpriteSheet worldSprite) {
         worldPixelData = world;
@@ -125,12 +157,24 @@ public class Game {
             inventory = new Image(ContentLoader.texturePath + "gui\\inventory.png");
             invButton_normal = new Image(ContentLoader.texturePath + "gui\\invbutton_nm.png");
             invButton_pressed = new Image(ContentLoader.texturePath + "gui\\invbutton_ps.png");
-            
-            baseImg = new Image(ContentLoader.texturePath + "houses\\home_s1.png");
 
-            //looks like a lot off work, but its only a one time thing...
-            //but it does things a lot easy for me xD
+            baseImg = new Image(ContentLoader.texturePath + "houses\\home_s1.png");
+            baseGUIItemButton_h = new Image(ContentLoader.texturePath + "gui\\Store\\buy_h.png");
+            baseGUIItemButton_n = new Image(ContentLoader.texturePath + "gui\\Store\\buy_n.png");
+            baseGUIItemFrame = new Image(ContentLoader.texturePath + "gui\\Store\\storeItem.png");
+            testItemLogo = new Image(ContentLoader.texturePath + "1.png");
+            baseGUIFrame = new Image(ContentLoader.texturePath + "gui\\Store\\window.png");
+
+            baseUpgradeGUI = new ShopGUI(Option.getWidth() / 2 - baseGUIFrame.getWidth() / 2,
+                    Option.getHeight() / 2 - baseGUIFrame.getHeight() / 2, baseGUIFrame);
+
+            //adding stuff....
             addInvSlots();
+            addShopItems();
+
+            //Rain
+            initializeRain();
+            generateLightingBolt(new Vector2f(50, 240), new Vector2f(290, 240), 100);
 
         } catch (Exception ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
@@ -194,7 +238,16 @@ public class Game {
         inventorySlot[44] = new ItemSlot(8 * 36 + 260 - sideBar.getWidth() / 2, 334);
     }
 
-    public void updatePlayer(GameContainer gc, int delta) {
+    public void addShopItems() {
+        //Base Upgrade
+        for (int i = 0; i < 10; i++) {
+            baseUpgradeGUI.addMenuItem(new ShopItemGUI(0, 0, testItemLogo, baseGUIItemFrame,
+                    baseGUIItemButton_n, baseGUIItemButton_h,
+                    "LOL LEVEL" + i, "(LOL) + " + i, i + 1258, "$"));
+        }
+    }
+
+    public void updatePlayer(GameContainer gc, int delta) throws SlickException {
 
         //Player
         if (gc.getInput().isKeyDown(Input.KEY_W) && moveable[0]) {
@@ -237,7 +290,9 @@ public class Game {
             }
         }
 
+        //GUI
         updateInventorry(gc);
+        updateBaseUpgradeGUI(gc);
 
         //Update all dynamic states
         if (!gc.isPaused()) {
@@ -266,9 +321,18 @@ public class Game {
                 }
             }
         }
+
+        //Update Rain
+        if (isRaining) {
+            updateRain();
+            if (isThunder) {
+                updateThunder(gc, delta);
+            }
+            alpha = 0.65F;
+        }
     }
 
-    public void render(GameContainer gc, Graphics g) {
+    public void render(GameContainer gc, Graphics g) throws SlickException {
 
         //render worlds
         if (renderWorldOne) {
@@ -298,7 +362,7 @@ public class Game {
         treeTiles.stream().forEach((treeTile) -> {
             treeTile.render(r_playerX, r_playerY, g);
         });
-        
+
         base.stream().forEach((base1) -> {
             base1.render(r_playerX, r_playerY, g);
         });
@@ -321,8 +385,25 @@ public class Game {
         lightCycle.setAlpha(alpha);
         lightCycle.draw(0, 0, Option.getWidth(), Option.getHeight());
 
+        //Render rain infront of world but not gui
+        if (isRaining) {
+            renderRain(gc, g);
+            if (isThunder) {
+                renderThunder(gc, g);
+            }
+
+            if (rainLoop) {
+                Main.mixer.loopSound(Sound.RAIN, 0.3F);
+                rainLoop = false;
+            }
+        } else {
+            Main.mixer.stopSound(Sound.RAIN);
+            rainLoop = true;
+        }
+
         //inGameGUI
         playerStatus.draw();//Default 0, 0
+        renderBaseUpgradeGUI(g);
 
         if (healthLevel >= minBarLvl && healthLevel <= maxBarLvl) {
             healthlvl.draw(86, 8, Math.round(healthLevel), 14);
@@ -356,12 +437,14 @@ public class Game {
             g.setColor(Color.orange);
             g.drawString("Current Time: " + alpha + ", TM: " + lightState
                     + ", RT: " + gc.getTime(), 10, 80);
-            g.drawString("\nFPS: " + gc.getFPS(), 10, 80);
-            g.drawString("\n\nPL M: " + movement, 10, 80);
-            g.drawString("\n\n\nPL H: " + Math.round(healthLevel)
+            g.drawString("\nRain: " + isRaining + ", Thunder: " + isThunder + 
+                    "\nStorm Size: " + stormSize + ", Thunder Countdown: " + lightingCount, 10, 80);
+            g.drawString("\n\n\nFPS: " + gc.getFPS(), 10, 80);
+            g.drawString("\n\n\n\nPL M: " + movement, 10, 80);
+            g.drawString("\n\n\n\n\nPL H: " + Math.round(healthLevel)
                     + ", W: " + Math.round(waterLevel)
                     + ", F: " + Math.round(foodLevel), 10, 80);
-            g.drawString("\n\n\n\nMX: " + gc.getInput().getMouseX() + ", MY: "
+            g.drawString("\n\n\n\n\n\nMX: " + gc.getInput().getMouseX() + ", MY: "
                     + gc.getInput().getMouseY(), 10, 80);
 
             worldPixelData[0].draw(Option.getWidth() - 96, 32, 64, 64);
@@ -372,7 +455,7 @@ public class Game {
         Image pixelData = world;
         int worldGenWidth = world.getWidth();
         int worldGenHeight = world.getHeight();
-        int tiles = 0;//for debuging;
+        int tiles = 0;//for debuging
 
         for (int worldGenx = 0; worldGenx < worldGenWidth; worldGenx++) {
 
@@ -408,7 +491,7 @@ public class Game {
             if (pixelData.getColor(worldGenx, worldGenY).equals(new Color(0, 0, 255))) {
                 addStaticTile(worldGenx, worldGenY, TileType.VAND005, worldSprite);
             }
-            
+
             if (pixelData.getColor(worldGenx, worldGenY).equals(new Color(0, 0, 0))) {
                 addBase(worldGenx, worldGenY, baseImg);
             }
@@ -422,11 +505,12 @@ public class Game {
     public void addTreeTile(int x, int y, TileType type, SpriteSheet spriteSheet) {
         treeTiles.add(new TreeTile(x, y, type, spriteSheet));
     }
-    
+
     public void addBase(int x, int y, Image baseImg) {
         base.add(new Base(x, y, baseImg));
     }
 
+    //Inventory
     //510 // 380
     private void renderInventory(Graphics g, GameContainer gc) {
         if (openinv) {
@@ -451,7 +535,7 @@ public class Game {
     }
 
     private void updateInventorry(GameContainer gc) {
-        if (gc.getInput().isKeyPressed(Input.KEY_E) && !openinv) {
+        if (gc.getInput().isKeyPressed(Input.KEY_E) && !openinv && !isBaseUpgradeShopOpen) {
             gc.setPaused(true);
             openinv = true;
         }
@@ -573,5 +657,200 @@ public class Game {
             }
             break;
         }
+    }
+
+    public void updateBaseUpgradeGUI(GameContainer gc) {
+        if (isBaseUpgradeShopOpen) {
+            baseUpgradeGUI.update();
+
+            //Check for item buying...
+            if (baseUpgradeGUI.isItemBuyed(1)) {
+                System.out.println("ITEM 01 BUYED");
+            }
+        }
+
+        if (gc.getInput().isKeyDown(Input.KEY_ESCAPE) && isBaseUpgradeShopOpen) {
+            isBaseUpgradeShopOpen = false;
+        }
+    }
+
+    public void renderBaseUpgradeGUI(Graphics g) {
+        if (isBaseUpgradeShopOpen) {
+            baseUpgradeGUI.render(g);
+        }
+    }
+
+    //Rain
+    class RainDrop extends Polygon {
+
+        public RainDrop(int size) {
+            super();
+            /**
+             * coordinates of vertices of polygon(rain drop)
+             */
+            this.addPoint(0, 0);
+            this.addPoint(0, size);
+        }
+    }
+
+    void updateRain() throws SlickException {
+        for (int i = 0; i < dropCount; i++) {
+            drops[i].setY(drops[i].getY() + 4.0f);
+            drops[i].setX(drops[i].getX() - 0.0f);
+
+            if (movement == 2) {
+                drops[i].setX(drops[i].getX() + 2.0f);
+            }
+
+            if (movement == 4) {
+                drops[i].setX(drops[i].getX() - 2.0f);
+            }
+
+            if (drops[i].getY() > 786) {
+                drops[i].setX((float) ((Math.random() * 2000) - 500));
+                drops[i].setY((float) ((Math.random() * 5)));
+            }
+        }
+    }
+
+    void renderRain(GameContainer gc, Graphics g) throws SlickException {
+        g.setColor(new Color(188.0f, 227.0f, 229.0f, 0.3f));
+
+        for (int i = 0; i < dropCount; i++) {
+            g.draw(drops[i]);
+        }
+    }
+
+    void initializeRain() {
+        drops = new RainDrop[dropCount];
+
+        for (int i = 0; i < dropCount; i++) {
+            drops[i] = new RainDrop((int) (Math.random() * 10 + 4));
+            drops[i].setX((float) ((Math.random() * 2000) + 30));
+            drops[i].setY((float) ((Math.random() * 750)));
+        }
+    }
+
+    //Lighting Strike Effect
+    public static class LightingBoltEffect {
+
+        Collection<Line> segments;
+
+        int totalTime;
+
+        int currentTime;
+
+        private float lineWidth;
+
+        public LightingBoltEffect(int time, Collection<Line> segments, float lineWidth) {
+            this.totalTime = time;
+            this.segments = segments;
+            this.currentTime = time;
+            this.lineWidth = lineWidth;
+        }
+
+        public void update(int delta) {
+            currentTime -= delta;
+            if (currentTime <= 0) {
+                currentTime = 0;
+            }
+        }
+
+        public void render() {
+            float alpha = (float) currentTime / (float) totalTime;
+            glPushMatrix();
+            glColor4f(alpha, alpha, alpha, alpha);
+            glLineWidth(lineWidth);
+            glBegin(GL_LINES);
+            {
+                for (Line segment : segments) {
+                    glVertex(segment.getStart());
+                    glVertex(segment.getEnd());
+                }
+            }
+            glEnd();
+            glPopMatrix();
+        }
+
+        public boolean isDone() {
+            return currentTime <= 0;
+        }
+
+        public void glVertex(Vector2f v) {
+            glVertex3f(v.x, v.y, 0);
+        }
+
+    }
+
+    protected void generateLightingBolt(Vector2f p0, Vector2f p1, int duration) {
+        Collection<Line> segments = new ArrayList<Line>();
+
+        segments.add(new Line(p0, p1));
+
+        float offset = 200f;
+        double probability = 0.3; // probability to generate new partitions  
+        float height = 50.0f;
+
+        Random random = new Random();
+
+        int partitions = 4;
+
+        for (int i = 0; i < partitions; i++) {
+
+            Collection<Line> newSegments = new ArrayList<Line>();
+
+            for (Line segment : segments) {
+
+                Vector2f midPoint = segment.getStart().copy().add(segment.getEnd()).scale(0.5f);
+
+                Vector2f perpendicular = midPoint.copy().add(90);
+                perpendicular.normalise().scale(random.nextFloat() * offset - (offset / 2));
+                midPoint.add(perpendicular);
+
+                if (random.nextFloat() < probability) {
+                    // generate new branch  
+                    Vector2f direction = midPoint.copy().sub(segment.getStart());
+                    direction.add(random.nextFloat() * height);
+                    newSegments.add(new Line(midPoint.copy(), midPoint.copy().add(direction)));
+                }
+
+                newSegments.add(new Line(segment.getStart().copy(), midPoint.copy()));
+                newSegments.add(new Line(midPoint.copy(), segment.getEnd().copy()));
+            }
+
+            segments = newSegments;
+
+            offset /= 2;
+        }
+        lightingBoltEffect = new LightingBoltEffect(duration, segments, 2.0f);
+    }
+
+    public void updateThunder(GameContainer container, int delta) throws SlickException {
+        Random random = new Random();
+
+        lightingBoltEffect.update(delta);
+        if (!lightingBoltEffect.isDone()) {
+            return;
+        }
+
+        Input input = container.getInput();
+        lightingCount--;
+        if (lightingCount == 0) {
+            int mouseX = input.getMouseX();
+
+            int x = random.nextInt(Option.getWidth());
+
+            int duration = random.nextInt() % 600 + 300;
+            generateLightingBolt(new Vector2f(x, 0), new Vector2f((mouseX), 0 + Option.getHeight() - 100), duration);
+
+            Main.mixer.playSound(Sound.THUNDER);
+            lightingCount = random.nextInt(stormSize);
+        }
+    }
+
+    public void renderThunder(GameContainer container, Graphics g) throws SlickException {
+        SlickCallable.enterSafeBlock();
+        lightingBoltEffect.render();
+        SlickCallable.leaveSafeBlock();
     }
 }
